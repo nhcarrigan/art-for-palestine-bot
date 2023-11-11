@@ -41,17 +41,17 @@ import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
     if (!reaction) {
       return;
     }
-    if (reaction.count > 2) {
-      await r.users.remove(user.id);
-      return;
-    }
     const message = await r.message.fetch().catch(async (err) => {
       await debug.send({
         content: `[Failed to fetch message:](<${r.message.url}>) ${err.message}`,
       });
       return null;
     });
-    if (!message) {
+    if (!message || message.author.id !== "1172850885571911760") {
+      return;
+    }
+    if (reaction.count > 2) {
+      await r.users.remove(user.id);
       return;
     }
     const files = [...message.attachments.values()];
