@@ -1,4 +1,27 @@
-import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  Message,
+  WebhookClient,
+} from "discord.js";
+
+enum Webhooks {
+  NewCommissions = "1172850885571911760",
+  CompleteCommissions = "1173062416041525259",
+}
+
+const DMTexts: { [key in Webhooks]: (message: Message) => string } = {
+  [Webhooks.NewCommissions]: (message) =>
+    `[Here is the donation commission you claimed~!](${message.url})\n> ${message.content}`,
+  [Webhooks.CompleteCommissions]: (message) =>
+    `[Thank you for agreeing to deliver the following commission~!](${message.url})\n> ${message.content}`,
+};
+
+const isValidHook = (id: string): id is Webhooks =>
+  (
+    [Webhooks.NewCommissions, Webhooks.CompleteCommissions] as string[]
+  ).includes(id);
 
 (async () => {
   const debug = new WebhookClient({
@@ -18,7 +41,7 @@ import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
   });
 
   bot.on(Events.MessageCreate, async (message) => {
-    if (message.author.id !== "1172850885571911760") {
+    if (!isValidHook(message.author.id)) {
       return;
     }
     await message.react("✅").catch(async (err) => {
@@ -47,7 +70,7 @@ import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
       });
       return null;
     });
-    if (!message || message.author.id !== "1172850885571911760") {
+    if (!message || !isValidHook(message.author.id)) {
       return;
     }
     if (reaction.count > 2) {
@@ -57,7 +80,7 @@ import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
     const files = [...message.attachments.values()];
     await user
       .send({
-        content: `[Here is the donation commission you claimed~!](${message.url})\n> ${message.content}`,
+        content: DMTexts[message.author.id](message),
         files,
       })
       .catch(async (err) => {
