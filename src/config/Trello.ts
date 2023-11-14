@@ -3,6 +3,7 @@ import { Webhooks } from "./Webhooks";
 export const Trello = {
   boardId: "",
   newCardListId: "6552f24264ac58e98f8b78cd",
+  readyToSendListId: "6552f248af3c5fb5a81e4788",
   platformLabels: {
     discord: "6552f2b18af54bcca998abfe",
     twitter: "6552f2cb9f21432b29106558",

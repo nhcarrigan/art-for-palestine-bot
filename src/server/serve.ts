@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import { readFile } from "fs/promises";
 import http from "http";
 import https from "https";
@@ -131,6 +132,67 @@ export const serve = async (bot: ExtendedClient) => {
         }`,
       });
     }
+  });
+
+  /**
+   * Trello expects a 200 head status.
+   */
+  app.head("/trello", (_req, res) => {
+    res.status(200).send("OK~");
+  });
+
+  app.post("/trello", async (req, res) => {
+    const secret = process.env.TRELLO_SECRET;
+    if (!secret) {
+      res.status(500).send("Missing trello key~!");
+      await bot.debug.send({
+        content:
+          "Received a request to the trello endpoint, but key is not configured.",
+      });
+      return;
+    }
+    const headerHash = req.headers["x-trello-webhook"];
+    const getDigest = (s: string) =>
+      createHmac("sha1", secret).update(s).digest("base64");
+    const content = JSON.stringify(req.body) + process.env.TRELLO_HOOK_CALLBACK;
+    const contentHash = getDigest(content);
+    if (headerHash !== contentHash) {
+      res.status(403).send("Invalid hash!");
+      await bot.debug.send({
+        content:
+          "Received a request to the trello endpoint, but hash was incorrect.",
+      });
+      return;
+    }
+    res.status(200).send("OK~!");
+    const oldList = req.body.action?.data?.old?.idList;
+    const newList = req.body.action?.data?.card?.idList;
+    const cardId = req.body.action?.data?.card?.id;
+    if (
+      !oldList ||
+      !newList ||
+      !cardId ||
+      oldList === newList ||
+      newList !== Trello.readyToSendListId
+    ) {
+      return;
+    }
+
+    const cardRes = await fetch(
+      `https://api.trello.com/1/cards/${cardId}?key=${process.env.TRELLO_KEY}&token=${process.env.TRELLO_TOKEN}`
+    );
+    const card = (await cardRes.json()) as {
+      id: string;
+      url: string;
+      name: string;
+      desc: string;
+    };
+    const contact = card.desc
+      .split(/\n+/g)
+      .find((s) => s.startsWith("Please contact them"));
+    await bot.dist.send({
+      content: `${card.name} | [Trello Card](<${card.url}>) | ${contact}\nYou can ignore this it's just for the bot. ${card.id}`,
+    });
   });
 
   const httpServer = http.createServer(app);
