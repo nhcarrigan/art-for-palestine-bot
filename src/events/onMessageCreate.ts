@@ -16,6 +16,9 @@ export const onMessageCreate = async (
   message: Message
 ) => {
   try {
+    if (!message.author.bot) {
+      return;
+    }
     if (message.author.bot && !isValidWebhook(message.author.id)) {
       logHandler.log(
         "info",
