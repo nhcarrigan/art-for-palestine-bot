@@ -1,3 +1,5 @@
+import { execSync } from "child_process";
+
 import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
 
 import { onMessageCreate } from "./events/onMessageCreate";
@@ -27,6 +29,17 @@ import { logHandler } from "./utils/logHandler";
   bot.debug = new WebhookClient({ url: process.env.DEBUG });
   bot.comm = new WebhookClient({ url: process.env.COMM });
   bot.dist = new WebhookClient({ url: process.env.DIST });
+
+  const commit = execSync("git rev-parse HEAD").toString().trim();
+
+  await bot.debug.send({
+    content: `Bot is starting up.\nVersion: ${
+      process.env.npm_package_version
+    }\nCommit: [${commit.slice(
+      0,
+      7
+    )}](<https://github.com/nhcarrigan/art-for-palestine-bot/commit/${commit}>)`,
+  });
 
   bot.on(Events.ClientReady, async () => {
     await onReady(bot);
