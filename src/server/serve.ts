@@ -120,7 +120,7 @@ export const serve = async (bot: ExtendedClient) => {
         );
       }
       await bot.comm.send({
-        content: `${name} | [Trello](<${card.url}>) | [Reference](<${image.url}>)`,
+        content: `${name} | [Trello](<${card.url}>) | [Reference](<${image.url}>)\nYou can ignore this it's just for the bot. ${card.id}`,
         files: [file],
       });
       return;

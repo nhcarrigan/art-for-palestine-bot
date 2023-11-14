@@ -7,6 +7,4 @@ import { Webhooks } from "../config/Webhooks";
  * @returns {boolean} If the webhook ID is valid.
  */
 export const isValidWebhook = (id: string): id is Webhooks =>
-  (
-    [Webhooks.NewCommissions, Webhooks.CompleteCommissions] as string[]
-  ).includes(id);
+  (Object.values(Webhooks) as string[]).includes(id);
