@@ -1,3 +1,5 @@
+import { Webhooks } from "./Webhooks";
+
 export const Trello = {
   boardId: "",
   newCardListId: "6552f24264ac58e98f8b78cd",
@@ -24,4 +26,20 @@ export const ActionsToLabel: Record<string, string> = {
   "Sent a donation": Trello.actionLabels.donate,
   "Called my representatives": Trello.actionLabels.call,
   "Attended a protest": Trello.actionLabels.protest,
+};
+
+/**
+ * Grabs the message from Discord, formats it into a Trello comment.
+ *
+ * @param {string} userName The name of the user that triggered the comment.
+ * @returns {string} The formatted text to send.
+ */
+export const TrelloComments: {
+  [key in Webhooks]: (userName: string) => string;
+} = {
+  [Webhooks.NewCommissions]: (userName) => `Artwork claimed by ${userName}.`,
+  [Webhooks.CompleteCommissions]: (userName) =>
+    `Distribution claimed by ${userName}.`,
+  [Webhooks.NewTest]: (userName) => `Artwork claimed by ${userName}.`,
+  [Webhooks.CompleteTest]: (userName) => `Distribution claimed by ${userName}.`,
 };
