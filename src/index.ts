@@ -1,10 +1,16 @@
+import { readFile } from "fs/promises";
+import http from "http";
+import https from "https";
+
 import {
+  AttachmentBuilder,
   Client,
   Events,
   GatewayIntentBits,
   Message,
   WebhookClient,
 } from "discord.js";
+import express from "express";
 
 enum Webhooks {
   NewCommissions = "1172850885571911760",
@@ -91,4 +97,76 @@ const isValidHook = (id: string): id is Webhooks =>
   });
 
   await bot.login(process.env.TOKEN);
+
+  const app = express();
+  app.use(express.json());
+
+  app.get("/", (_req, res) => {
+    res.status(302).redirect("https://art4palestine.org/");
+  });
+
+  app.post("/airtable", async (req, res) => {
+    try {
+      if (req.body.secret !== process.env.AIRTABLE_SECRET) {
+        res.status(403).send("Invalid secret.");
+        await debug.send({
+          content: "Received an airtable payload with an invalid secret.",
+        });
+        return;
+      }
+      res.status(200).send("OK~!");
+      const { name, imageUrl } = req.body;
+      const image = await fetch(imageUrl);
+      const imageBuffer = await image.arrayBuffer();
+      const imageFinal = Buffer.from(imageBuffer);
+      const file = new AttachmentBuilder(imageFinal, {
+        name: "reference.png",
+      });
+      const hook = new WebhookClient({ url: process.env.NEW_COMM_HOOK ?? "" });
+      await hook.send({
+        content: `${name} | Trello coming soon | [Reference](<${image.url}>)`,
+        files: [file],
+      });
+      return;
+    } catch (err) {
+      await debug.send({
+        content: `Failed to process airtable automation: ${
+          (err as Error).message
+        }`,
+      });
+    }
+  });
+
+  const httpServer = http.createServer(app);
+
+  httpServer.listen(10080, async () => {
+    await debug.send("http server listening on port 10080");
+  });
+
+  if (process.env.NODE_ENV === "production") {
+    const privateKey = await readFile(
+      "/etc/letsencrypt/live/afp.nhcarrigan.com/privkey.pem",
+      "utf8"
+    );
+    const certificate = await readFile(
+      "/etc/letsencrypt/live/afp.nhcarrigan.com/cert.pem",
+      "utf8"
+    );
+    const ca = await readFile(
+      "/etc/letsencrypt/live/afp.nhcarrigan.com/chain.pem",
+      "utf8"
+    );
+
+    const credentials = {
+      key: privateKey,
+      cert: certificate,
+      ca: ca,
+    };
+
+    const httpsServer = https.createServer(credentials, app);
+
+    httpsServer.listen(10443, async () => {
+      await debug.send("https server listening on port 10443");
+    });
+  }
 })();
