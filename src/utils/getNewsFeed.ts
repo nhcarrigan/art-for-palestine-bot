@@ -51,6 +51,7 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
     if (!sliced.length) {
       return;
     }
+    bot.lastArticle = sliced[0].link ?? bot.lastArticle;
     for (const article of sliced) {
       if (!article.title || !article.link) {
         continue;
