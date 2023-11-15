@@ -26,15 +26,15 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
     const filtered = feed.items.filter((i) =>
       keywords.some((word) => i.title?.toLowerCase().includes(word))
     );
-    if (!filtered[0]) {
+    if (!feed.items[0] || !feed.items[0].link) {
       await bot.debug.send({
         content:
-          "Error fetching articles and applying filter. Please investigate feed manually.",
+          "Error fetching any data from RSS feed. Naomi, please investigate.",
       });
       return;
     }
     if (!bot.lastArticle) {
-      bot.lastArticle = filtered[0].link || "";
+      bot.lastArticle = filtered[0].link ?? feed.items[0].link;
       await bot.debug.send({
         content: `Last article not cached. Caching ${filtered[0].title}, skipping this run.`,
       });

@@ -10,8 +10,10 @@ import { getNewsFeed } from "../utils/getNewsFeed";
 export const onReady = async (bot: ExtendedClient) => {
   try {
     await bot.debug.send("Bot is online and ready to help!");
-    setInterval(async () => await getNewsFeed(bot), 1000 * 60 * 30);
+    await bot.debug.send("Fetching initial news feed...");
+    await getNewsFeed(bot);
     await bot.debug.send("Fetching news posts every 30 minutes.");
+    setInterval(async () => await getNewsFeed(bot), 1000 * 60 * 30);
     await serve(bot);
   } catch (err) {
     await bot.debug.send(`Error on ready event: ${(err as Error).message}`);
