@@ -106,7 +106,9 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
         continue;
       }
       await bot.news.send(
-        `[${article.title}](<https://aje.io/rpfpqc?update=${article.id}>)\n--------`
+        `[${article.title}](<${article.link.replace(/\/$/, "")}?update=${
+          article.id
+        }>)\n--------`
       );
     }
   } catch (err) {
