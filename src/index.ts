@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 
 import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
 
+import { onMemberAdd } from "./events/onMemberAdd";
 import { onMessageCreate } from "./events/onMessageCreate";
 import { onReactionAdd } from "./events/onReactionAdd";
 import { onReady } from "./events/onReady";
@@ -25,6 +26,7 @@ import { logHandler } from "./utils/logHandler";
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessageReactions,
       GatewayIntentBits.MessageContent,
+      GatewayIntentBits.GuildMembers,
     ],
   }) as ExtendedClient;
   bot.debug = new WebhookClient({ url: process.env.DEBUG });
@@ -53,6 +55,10 @@ import { logHandler } from "./utils/logHandler";
 
   bot.on(Events.MessageReactionAdd, async (r, user) => {
     await onReactionAdd(bot, r, user);
+  });
+
+  bot.on(Events.GuildMemberAdd, async (member) => {
+    await onMemberAdd(bot, member);
   });
 
   await bot.login(process.env.TOKEN);
