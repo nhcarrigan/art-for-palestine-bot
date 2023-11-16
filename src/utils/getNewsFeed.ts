@@ -106,7 +106,7 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
         continue;
       }
       await bot.news.send(
-        `[${article.title}](https://www.aljazeera.com<${article.link.replace(
+        `[${article.title}](<https://www.aljazeera.com${article.link.replace(
           /\/$/,
           ""
         )}?update=${article.id}>)\n--------`
