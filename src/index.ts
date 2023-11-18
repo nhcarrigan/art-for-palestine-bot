@@ -8,6 +8,7 @@ import { onReactionAdd } from "./events/onReactionAdd";
 import { onReady } from "./events/onReady";
 import { ExtendedClient } from "./interface/ExtendedClient";
 import { logHandler } from "./utils/logHandler";
+import { onInteractionCreate } from "./events/onInteractionCreate";
 
 (async () => {
   if (
@@ -61,6 +62,10 @@ import { logHandler } from "./utils/logHandler";
 
   bot.on(Events.GuildMemberAdd, async (member) => {
     await onMemberAdd(bot, member);
+  });
+
+  bot.on(Events.InteractionCreate, async (interaction) => {
+    await onInteractionCreate(bot, interaction);
   });
 
   await bot.login(process.env.TOKEN);
