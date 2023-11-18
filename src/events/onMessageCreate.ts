@@ -1,6 +1,7 @@
 import { Message, PermissionFlagsBits } from "discord.js";
 
 import { ExtendedClient } from "../interface/ExtendedClient";
+import { logTicketMessage } from "../modules/logTicketMessage";
 import { getMuteDurationUnit } from "../utils/getMuteDurationUnit";
 import { isValidWebhook } from "../utils/isValidWebhook";
 import { logHandler } from "../utils/logHandler";
@@ -18,6 +19,17 @@ export const onMessageCreate = async (
 ) => {
   try {
     if (!message.author.bot) {
+      if (
+        !message.channel.isDMBased() &&
+        message.channel.name.startsWith("ticket-")
+      ) {
+        const id = message.channel.id;
+        const cached = bot.ticketLogs[id];
+        if (!cached) {
+          return;
+        }
+        await logTicketMessage(bot, message, cached);
+      }
       if (
         message.member?.permissions.has(PermissionFlagsBits.ModerateMembers)
       ) {

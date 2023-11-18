@@ -15,7 +15,8 @@ import { logHandler } from "./utils/logHandler";
     !process.env.DEBUG ||
     !process.env.COMM ||
     !process.env.DIST ||
-    !process.env.NEWS
+    !process.env.NEWS ||
+    !process.env.TICKET
   ) {
     logHandler.log("error", "Missing environment variables.");
     return;
@@ -33,6 +34,7 @@ import { logHandler } from "./utils/logHandler";
   bot.comm = new WebhookClient({ url: process.env.COMM });
   bot.dist = new WebhookClient({ url: process.env.DIST });
   bot.news = new WebhookClient({ url: process.env.NEWS });
+  bot.ticket = new WebhookClient({ url: process.env.TICKET });
 
   const commit = execSync("git rev-parse HEAD").toString().trim();
 
