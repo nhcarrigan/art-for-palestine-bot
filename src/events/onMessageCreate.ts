@@ -2,6 +2,7 @@ import { Message, PermissionFlagsBits } from "discord.js";
 
 import { ExtendedClient } from "../interface/ExtendedClient";
 import { logTicketMessage } from "../modules/logTicketMessage";
+import { startTicketPost } from "../modules/messages/startTicketPost";
 import { getMuteDurationUnit } from "../utils/getMuteDurationUnit";
 import { isValidWebhook } from "../utils/isValidWebhook";
 import { logHandler } from "../utils/logHandler";
@@ -19,6 +20,13 @@ export const onMessageCreate = async (
 ) => {
   try {
     if (!message.author.bot) {
+      if (
+        message.member?.permissions.has(PermissionFlagsBits.ManageGuild) &&
+        message.content === "~tickets"
+      ) {
+        await startTicketPost(bot, message);
+        return;
+      }
       if (
         !message.channel.isDMBased() &&
         message.channel.name.startsWith("ticket-")
