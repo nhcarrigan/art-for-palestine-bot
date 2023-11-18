@@ -36,6 +36,7 @@ import { onInteractionCreate } from "./events/onInteractionCreate";
   bot.dist = new WebhookClient({ url: process.env.DIST });
   bot.news = new WebhookClient({ url: process.env.NEWS });
   bot.ticket = new WebhookClient({ url: process.env.TICKET });
+  bot.ticketLogs = {};
 
   const commit = execSync("git rev-parse HEAD").toString().trim();
 
