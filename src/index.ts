@@ -2,13 +2,13 @@ import { execSync } from "child_process";
 
 import { Client, Events, GatewayIntentBits, WebhookClient } from "discord.js";
 
+import { onInteractionCreate } from "./events/onInteractionCreate";
 import { onMemberAdd } from "./events/onMemberAdd";
 import { onMessageCreate } from "./events/onMessageCreate";
 import { onReactionAdd } from "./events/onReactionAdd";
 import { onReady } from "./events/onReady";
 import { ExtendedClient } from "./interface/ExtendedClient";
 import { logHandler } from "./utils/logHandler";
-import { onInteractionCreate } from "./events/onInteractionCreate";
 
 (async () => {
   if (
