@@ -22,7 +22,10 @@ export const startTicketPost = async (
     const embed = new EmbedBuilder();
     embed.setTitle("Need Help?");
     embed.setDescription(
-      "If you need help with one of our projects, and you want to speak with our support team privately, you can open a ticket!\n\nClick the button below to open a private ticket with the support team."
+      `**Need Help?**
+If you have concerns with behavior in this Discord server, click the button below to open a private ticket with the Moderation team.
+
+If you want to contact the team for any other reason, you can message an Admin or send an email to \`contact@art4palestine.org\`.`
     );
     embed.setColor("#0099ff");
 
