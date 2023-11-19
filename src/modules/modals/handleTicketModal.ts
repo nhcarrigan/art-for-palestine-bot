@@ -29,7 +29,7 @@ export const handleTicketModal = async (
 
     if (!guild || !channel || !("threads" in channel)) {
       await interaction.editReply(
-        "Forgive me, but this can only be done within Naomi's community."
+        "Forgive me, but this can only be done within a server"
       );
       return;
     }

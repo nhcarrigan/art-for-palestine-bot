@@ -15,12 +15,13 @@ export const ticketOpenHandler: ButtonHandler = async (bot, interaction) => {
   try {
     const ticketModal = new ModalBuilder()
       .setCustomId("ticket-modal")
-      .setTitle("Naomi's Ticket System");
+      .setTitle("Ticket System");
     const reasonInput = new TextInputBuilder()
       .setCustomId("reason")
       .setLabel("Why are you opening this ticket?")
       .setStyle(TextInputStyle.Paragraph)
-      .setRequired(true);
+      .setRequired(true)
+      .setMaxLength(1000);
 
     const actionRow =
       new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
