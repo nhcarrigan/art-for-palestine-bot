@@ -117,12 +117,3 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
     );
   }
 };
-
-getNewsFeed({
-  debug: {
-    send: console.error,
-  },
-  news: {
-    send: console.info,
-  },
-} as never);
