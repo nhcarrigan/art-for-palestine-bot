@@ -6,6 +6,6 @@ export interface ExtendedClient extends Client {
   dist: WebhookClient;
   news: WebhookClient;
   ticket: WebhookClient;
-  lastArticle: number;
+  lastArticle: string;
   ticketLogs: { [key: string]: string };
 }
