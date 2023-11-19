@@ -3,7 +3,7 @@ import { ExtendedClient } from "../interface/ExtendedClient";
 const getHeadlineArticle = async (bot: ExtendedClient) => {
   try {
     const req = await fetch(
-      "https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoBreakingTickerQuery&variables=%7B%7D&extensions=%7B%7D",
+      "https://www.aljazeera.com/tag/israel-palestine-conflict/",
       {
         method: "GET",
         headers: {
@@ -11,10 +11,9 @@ const getHeadlineArticle = async (bot: ExtendedClient) => {
         },
       }
     );
-    const res = (await req.json()) as {
-      data: { breakingNews: { post: string; link: string } };
-    };
-    return res.data.breakingNews;
+    const res = await req.text();
+    const link = res.match(/<a target="" href="(.*)">Live\supdates<\/a>/);
+    return link?.[1];
   } catch (err) {
     await bot.debug.send(
       `Error in fetching latest news post: ${(err as Error).message}`
@@ -86,7 +85,7 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
     }
     const children = await getArticleChildren(
       bot,
-      headline.link.split("/").slice(-1).join()
+      headline.split("/").slice(-1).join()
     );
     if (!children) {
       return;
@@ -118,3 +117,12 @@ export const getNewsFeed = async (bot: ExtendedClient) => {
     );
   }
 };
+
+getNewsFeed({
+  debug: {
+    send: console.error,
+  },
+  news: {
+    send: console.info,
+  },
+} as never);
