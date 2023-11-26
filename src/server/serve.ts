@@ -32,7 +32,7 @@ export const serve = async (bot: ExtendedClient) => {
         return;
       }
       res.status(200).send("OK~!");
-      const { name, imageUrl, action, platform, handle, note, email } =
+      const { name, imageUrl, action, platform, handle, note, email, request } =
         req.body;
       const image = await fetch(imageUrl);
       const imageBuffer = await image.arrayBuffer();
@@ -59,7 +59,7 @@ export const serve = async (bot: ExtendedClient) => {
         )}&desc=${encodeURIComponent(
           `${name} helped us with: ${action}\n\nPlease contact them at ${
             platform === "Email" ? email : `${handle} on ${platform}`
-          } to update them on art.\n\nUSER NOTE: ${note}`
+          } to update them on art.\n\nUSER NOTE: ${note}\nART REQUEST: ${request}`
         )}`,
         {
           method: "POST",
