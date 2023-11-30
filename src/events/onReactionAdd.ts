@@ -61,7 +61,7 @@ export const onReactionAdd = async (
         });
       });
     const trelloId = message.content.split(
-      "You can ignore this it's just for the bot. "
+      "You can ignore this ID it's just for the bot: "
     )[1];
     if (trelloId) {
       await fetch(

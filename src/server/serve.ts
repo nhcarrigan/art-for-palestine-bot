@@ -32,22 +32,27 @@ export const serve = async (bot: ExtendedClient) => {
         return;
       }
       res.status(200).send("OK~!");
-      const { name, imageUrl, action, platform, handle, note, email, request } =
+      const { name, images, action, platform, handle, note, email, request } =
         req.body;
-      const image = await fetch(imageUrl);
-      const imageBuffer = await image.arrayBuffer();
-      const imageFinal = Buffer.from(imageBuffer);
-      const file = new AttachmentBuilder(imageFinal, {
-        name: "reference.png",
-      });
+      const files: AttachmentBuilder[] = [];
+      for (const imageUrl of images) {
+        const image = await fetch(imageUrl);
+        const imageBuffer = await image.arrayBuffer();
+        const imageFinal = Buffer.from(imageBuffer);
+        const file = new AttachmentBuilder(imageFinal, {
+          name: "reference.png",
+        });
+        files.push(file);
+      }
+
       if (!process.env.TRELLO_TOKEN || !process.env.TRELLO_KEY) {
         await bot.debug.send({
           content:
             "Cannot create card on Trello. Missing environment variables.",
         });
         await bot.comm.send({
-          content: `${name} | Trello failed to generate. | [Reference](<${image.url}>)`,
-          files: [file],
+          content: `${name} | Trello failed to generate. | References attached below:`,
+          files,
         });
         return;
       }
@@ -74,7 +79,9 @@ export const serve = async (bot: ExtendedClient) => {
           process.env.TRELLO_KEY
         }&token=${
           process.env.TRELLO_TOKEN
-        }&name=reference.png&url=${encodeURIComponent(imageUrl)}&setCover=true`,
+        }&name=reference.png&url=${encodeURIComponent(
+          images[0]
+        )}&setCover=true`,
         {
           method: "POST",
           headers: {
@@ -82,6 +89,21 @@ export const serve = async (bot: ExtendedClient) => {
           },
         }
       );
+      for (const imageUrl of images.slice(1)) {
+        await fetch(
+          `https://api.trello.com/1/cards/${card.id}/attachments?key=${
+            process.env.TRELLO_KEY
+          }&token=${
+            process.env.TRELLO_TOKEN
+          }&name=reference.png&url=${encodeURIComponent(imageUrl)}`,
+          {
+            method: "POST",
+            headers: {
+              accept: "application/json",
+            },
+          }
+        );
+      }
       // Use this if we want to add checklist to every card :3
       //   await fetch(
       //     `https://api.trello.com/1/cards/${
@@ -121,8 +143,8 @@ export const serve = async (bot: ExtendedClient) => {
         );
       }
       await bot.comm.send({
-        content: `${name} | [Trello](<${card.url}>) | [Reference](<${image.url}>)\nYou can ignore this it's just for the bot. ${card.id}`,
-        files: [file],
+        content: `${name} | [Trello](<${card.url}>) | References attached below.\nYou can ignore this ID it's just for the bot: ${card.id}`,
+        files,
       });
       return;
     } catch (err) {
@@ -191,7 +213,7 @@ export const serve = async (bot: ExtendedClient) => {
       .split(/\n+/g)
       .find((s) => s.startsWith("Please contact them"));
     await bot.dist.send({
-      content: `${card.name} | [Trello Card](<${card.url}>) | ${contact}\nYou can ignore this it's just for the bot. ${card.id}`,
+      content: `${card.name} | [Trello Card](<${card.url}>) | ${contact}\nYou can ignore this ID it's just for the bot: ${card.id}`,
     });
   });
 
