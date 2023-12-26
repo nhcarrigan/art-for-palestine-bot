@@ -60,9 +60,11 @@ export const onReactionAdd = async (
           content: `[Failed to DM ${user.username}:](<${r.message.url}>) ${err.message}`,
         });
       });
-    const trelloId = message.content.split(
-      "You can ignore this ID it's just for the bot: "
-    )[1];
+    const trelloId =
+      message.content.split("You can ignore this it's just for the bot. ")[1] ||
+      message.content.split(
+        "You can ignore this ID it's just for the bot: "
+      )[1];
     if (trelloId) {
       await fetch(
         `https://api.trello.com/1/cards/${trelloId}/actions/comments?text=${TrelloComments[
@@ -77,6 +79,14 @@ export const onReactionAdd = async (
           },
         }
       );
+      await bot.db.rewards.update({
+        where: {
+          trelloId,
+        },
+        data: {
+          claimedBy: user.id,
+        },
+      });
     }
   } catch (err) {
     await bot.debug.send(
