@@ -142,7 +142,7 @@ export const serve = async (bot: ExtendedClient) => {
           }
         );
       }
-      await bot.comm.send({
+      const msg = await bot.comm.send({
         content: `${name} | [Trello](<${card.url}>) | References attached below.\nYou can ignore this ID it's just for the bot: ${card.id}`,
         files,
       });
@@ -152,6 +152,7 @@ export const serve = async (bot: ExtendedClient) => {
           createdAt: Date.now(),
           claimedBy: "",
           completed: false,
+          messageId: msg.id,
         },
       });
       return;

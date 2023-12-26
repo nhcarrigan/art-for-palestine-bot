@@ -8,13 +8,15 @@ datasource db {
 }
 
 model rewards {
-    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    id        String  @id @default(auto()) @map("_id") @db.ObjectId
     trelloId  String
-    createdAt   Int     @default(0)
-    claimedBy   String  @default("") // user who claimed
-    completed   Boolean @default(false)
+    messageId String
+    createdAt Int     @default(0)
+    claimedBy String  @default("") // user who claimed
+    completed Boolean @default(false)
 
     @@unique([trelloId], map: "trello")
+    @@unique([messageId], map: "message")
     @@index([claimedBy, completed])
     @@index([claimedBy])
 }
