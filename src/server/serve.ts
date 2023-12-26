@@ -146,6 +146,14 @@ export const serve = async (bot: ExtendedClient) => {
         content: `${name} | [Trello](<${card.url}>) | References attached below.\nYou can ignore this ID it's just for the bot: ${card.id}`,
         files,
       });
+      await bot.db.rewards.create({
+        data: {
+          trelloId: card.id,
+          createdAt: Date.now(),
+          claimedBy: "",
+          completed: false,
+        },
+      });
       return;
     } catch (err) {
       await bot.debug.send({
@@ -214,6 +222,14 @@ export const serve = async (bot: ExtendedClient) => {
       .find((s) => s.startsWith("Please contact them"));
     await bot.dist.send({
       content: `${card.name} | [Trello Card](<${card.url}>) | ${contact}\nYou can ignore this ID it's just for the bot: ${card.id}`,
+    });
+    await bot.db.rewards.update({
+      where: {
+        trelloId: card.id,
+      },
+      data: {
+        completed: true,
+      },
     });
   });
 
