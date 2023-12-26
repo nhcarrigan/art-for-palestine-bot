@@ -1,0 +1,20 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("MONGO_URI")
+}
+
+model rewards {
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    trelloId  String
+    createdAt   Int     @default(0)
+    claimedBy   String  @default("") // user who claimed
+    completed   Boolean @default(false)
+
+    @@unique([trelloId], map: "trello")
+    @@index([claimedBy, completed])
+    @@index([claimedBy])
+}
