@@ -49,6 +49,19 @@ export const onReactionAdd = async (
       await r.users.remove(user.id);
       return;
     }
+    const claimedByUser = await bot.db.rewards.findMany({
+      where: {
+        claimedBy: user.id,
+        completed: false,
+      },
+    });
+    if (claimedByUser.length > 2) {
+      await r.users.remove(user.id);
+      await user.send(
+        "You currently have 2 open art rewards. Please do not claim another until you have completed one of your outstanding art works."
+      );
+      return;
+    }
     const files = [...message.attachments.values()];
     await user
       .send({
