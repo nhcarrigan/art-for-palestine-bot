@@ -55,7 +55,7 @@ export const onReactionAdd = async (
         completed: false,
       },
     });
-    if (claimedByUser.length > 2) {
+    if (claimedByUser.length >= 2) {
       await r.users.remove(user.id);
       await user.send(
         "You currently have 2 open art rewards. Please do not claim another until you have completed one of your outstanding art works."
