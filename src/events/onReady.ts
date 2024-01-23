@@ -1,6 +1,7 @@
 import { scheduleJob } from "node-schedule";
 
 import { ExtendedClient } from "../interface/ExtendedClient";
+import { checkAirtableRecords } from "../modules/checkAirtableRecords";
 import { fetchMessages } from "../modules/messages/fetchMessages";
 import { sendUnclaimedArt } from "../modules/reminders/sendUnclaimedArt";
 import { sendUnfinishedArt } from "../modules/reminders/sendUnfinishedArt";
@@ -23,12 +24,14 @@ export const onReady = async (bot: ExtendedClient) => {
     await getNewsFeed(bot);
     await bot.debug.send("Fetching news posts every 10 minutes.");
     setInterval(async () => await getNewsFeed(bot), 1000 * 60 * 10);
+    await bot.debug.send("Fetching new airtable submissions every 60 minutes.");
+    setInterval(async () => await checkAirtableRecords(bot), 1000 * 60 * 60);
 
     scheduleJob("0 9 * * 1,3,5", async () => {
       await sendUnclaimedArt(bot);
     });
 
-    scheduleJob("0 9 * * * 6", async () => {
+    scheduleJob("0 9 * * 6", async () => {
       await sendUnfinishedArt(bot);
     });
 
